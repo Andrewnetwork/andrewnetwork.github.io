@@ -26,7 +26,7 @@ git clone git@github.com:YourUsername/jekyll-lambda.git
 Edit, add and modify the theme and content as you wish. Then run with Jekyll command line utility.
 
 ```
-jekyll serve -w
+bundle exec jekyll serve -w
 ```
 
 Profit?
