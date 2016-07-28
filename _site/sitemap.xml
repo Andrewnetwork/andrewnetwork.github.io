@@ -11,21 +11,21 @@
   
   <url>
     <loc>https://foo_bar.github.io/404.html</loc>
-    <lastmod>2016-07-27T22:33:45-04:00</lastmod>
+    <lastmod>2016-07-27T22:35:03-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>https://foo_bar.github.io/about/</loc>
-    <lastmod>2016-07-27T22:33:45-04:00</lastmod>
+    <lastmod>2016-07-27T22:35:03-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>https://foo_bar.github.io/</loc>
-    <lastmod>2016-07-27T22:33:45-04:00</lastmod>
+    <lastmod>2016-07-27T22:35:03-04:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
