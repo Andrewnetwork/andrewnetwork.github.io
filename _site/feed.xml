@@ -1,35 +1,1018 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Site Title</title>
-    <description>Blog about whatever.</description>
-    <link>https://foo_bar.github.io/</link>
-    <atom:link href="https://foo_bar.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Wed, 27 Jul 2016 22:35:03 -0400</pubDate>
-    <lastBuildDate>Wed, 27 Jul 2016 22:35:03 -0400</lastBuildDate>
-    <generator>Jekyll v2.2.0</generator>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-07-18T03:11:02-04:00</updated><id>http://localhost:4000/</id><title type="html">Andrew Ribeiro</title><subtitle>I blog about software, mathematics, machine learning, philosophy, psychology, art and the connections between them.  My main interest is machine learning and how it can be used to automatically build models that are near impossible for humans to  develop with traditional methods. </subtitle><entry><title type="html">A Project Based Introduction to TensorFlow.js</title><link href="http://localhost:4000/major/machine-learning/tensorflow/javascript/2018/07/06/tfjsintro.html" rel="alternate" type="text/html" title="A Project Based Introduction to TensorFlow.js" /><published>2018-07-06T12:20:24-04:00</published><updated>2018-07-06T12:20:24-04:00</updated><id>http://localhost:4000/major/machine-learning/tensorflow/javascript/2018/07/06/tfjsintro</id><content type="html" xml:base="http://localhost:4000/major/machine-learning/tensorflow/javascript/2018/07/06/tfjsintro.html">&lt;div class=&quot;figure&quot;&gt;
+    &lt;img style=&quot;&quot; src=&quot;http://localhost:4000/assets/images/2018/pbtfjs/tfjs.png&quot; /&gt;
+    &lt;div class=&quot;desc&quot; style=&quot;font-size: ;&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;In this post we introduce how to use &lt;a href=&quot;https://js.tensorflow.org/&quot;&gt;TensorFlow.js&lt;/a&gt; by demonstrating how it was used in the simple project &lt;a href=&quot;https://github.com/Andrewnetwork/NeuralTitanic&quot;&gt;Neural Titanic&lt;/a&gt;. In this project, we show how to visualize the evolution of the predictions of a single layer neural network as it is being trained on the tabular &lt;a href=&quot;https://www.kaggle.com/c/titanic&quot;&gt;Titanic Dataset&lt;/a&gt; for the task of binary classification of passenger survival. Here’s a look at what we will produce and a link to the live demo:&lt;/p&gt;
+
+&lt;div class=&quot;figure&quot;&gt;
+    &lt;img style=&quot;border: thin grey solid;&quot; src=&quot;http://localhost:4000/assets/images/2018/pbtfjs/ntDemo.gif&quot; /&gt;
+    &lt;div class=&quot;desc&quot; style=&quot;font-size: 20px;&quot;&gt;&lt;a href=&quot;https://andrewnetwork.github.io/NeuralTitanic/dist/&quot;&gt;Live Demo&lt;/a&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This article assumes that you have a basic understanding of modern frontend JavaScript development and a general awareness of basic machine learning topics. Please let me know in the comments if you have any questions.&lt;/p&gt;
+
+&lt;h1 id=&quot;outline&quot;&gt;Outline&lt;/h1&gt;
+&lt;ol&gt;
+  &lt;li&gt;&lt;a href=&quot;#nn&quot;&gt;Neural Networks&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#po&quot;&gt;Project Overview&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#dmo&quot;&gt;Dataset and Modeling Overview&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#ps&quot;&gt;Project Setup&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#code&quot;&gt;The Code&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#sum&quot;&gt;Summary&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h1 id=&quot;neural-networks&quot;&gt;&lt;a name=&quot;nn&quot;&gt;Neural Networks&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;Neural networks are finally getting their rightfully deserved day in the sun after many years of development by a rather small research community spearheaded by the likes of Geoffrey Hinton, Yoshua Bengio, Andrew Ng, and Yann LeCun. Traditional statistical models do very well on structured data,i.e. tabular data, but have notoriously struggled with unstructured data like images, audio, and natural language. Neural networks that contain many layers of neurons embody the research that is popularly called Deep Learning. The key insight and property of deep neural networks that make them suitable for modeling unstructured data is that complex data, like images, generally have many layers of unique features that are composed to produce the data. As a classic example: images have edges which form the basis for textures, textures form the basis for simple objects, simple objects form the basis for more complex objects, and so on. In deep neural networks we aim to learn these many layers of composable features. A full discussion of deep learning and neural networks is beyond the scope of this post, but here I provide links to a few talks I’ve given on the topic which contain many links to great resources.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10px; padding-right:10px;&quot;&gt;
+        
+&lt;table style=&quot;border: none !important;&quot;&gt;
+    &lt;tr&gt;
+        &lt;td style=&quot;text-align: center; border: none !important;&quot;&gt;
+            &lt;img class=&quot;aligncenter size-medium wp-image-249&quot; src=&quot;http://localhost:4000/assets/images/2018/pbtfjs/ddl.png&quot; alt=&quot;&quot; width=&quot;600&quot; /&gt;&lt;br /&gt;
+            &lt;a href=&quot;https://docs.google.com/presentation/d/1pDZLkFTFjuZzM8lIKkuCqgkFHthCVu6vMgNQge92tSY/edit?usp=sharing&quot;&gt;Slides&lt;/a&gt;
+        &lt;/td&gt;
+        &lt;td style=&quot; text-align: center; border: none !important;&quot;&gt;
+            &lt;img class=&quot;aligncenter wp-image-247 size-medium&quot; src=&quot;http://localhost:4000/assets/images/2018/pbtfjs/nnb.png&quot; alt=&quot;&quot; width=&quot;600&quot; /&gt;&lt;br /&gt;
+            &lt;a href=&quot;https://docs.google.com/presentation/d/1Ut8dFGGvY-DjsnDuHOjrEo_uWXkyBtDDg_xO2aKgqGI/edit?usp=sharing&quot;&gt;Slides&lt;/a&gt;
+        &lt;/td&gt;
+        &lt;td style=&quot; text-align: center; border: none !important;&quot;&gt;
+            &lt;img class=&quot;aligncenter size-medium wp-image-248&quot; src=&quot;http://localhost:4000/assets/images/2018/pbtfjs/tff.jpeg&quot; alt=&quot;&quot; width=&quot;600&quot; /&gt;&lt;br /&gt;
+            &lt;a href=&quot;https://docs.google.com/presentation/d/1r9rdWVj0xYluiMjUDBP88dj8hMgA7LywqQXp6WtciGA/edit?usp=sharing&quot;&gt;Slides&lt;/a&gt;
+        &lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;With the dramatic increase of computing power and available data over the last few decades, neural networks became viable for solving many real world problems. Today, libraries like TensorFlow and others are accelerating the adoption of neural networks for solving more problems by making it easy for typical programmers to experiment and innovate with the technology. TensorFlow.js is not the solution for every problem, but it is another step in the direction of making neural networks more accessible to everyone. Publications like Distil have proven to me the potential of introducing neural networks to the ecosystem of the modern web for educational purposes and beyond. I hope this article inspires you to make your own neural network powered applications as well.&lt;/p&gt;
+
+&lt;h1 id=&quot;project-overview&quot;&gt;&lt;a name=&quot;po&quot;&gt;Project Overview&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;As I mentioned above, neural networks are very well suited for modeling unstructured data … why then are we applying it to the structured data of the Titanic Dataset? I admit throwing a neural network at this data is like taking a rocket ship to work in the morning, but it is hoped that seeing neural networks work on simple tabular data gives you some insight into the behavior of how neural networks learn with respect to different hyperparameters of the network — like batch size, choice of activation functions, and number of neurons. As a principle, simpler models generally perform better on simpler data due to having less capacity for overfitting/memorization. For the Titanic Dataset, and as with almost all types of tabular data, ensemble methods like &lt;a href=&quot;https://en.wikipedia.org/wiki/Gradient_boosting&quot;&gt;boosted trees&lt;/a&gt; would perform better with much less hyperparameter tuning required. I mention this because upon hearing about neural networks, newcomers tend to think neural networks are the solution to every modeling problem; this is not the case and has been proven so in industry and on competitive data science platforms like &lt;a href=&quot;https://www.kaggle.com/&quot;&gt;Kaggle&lt;/a&gt; where ensemble methods reign king on structured data.&lt;/p&gt;
+
+&lt;p&gt;In this project we  show how to visualize the evolving predictions of a single layer neural network as it is being trained on the tabular Titanic Dataset for the task of binary classification of passenger survival. The colors of each row indicate the predicted survival probability for each passenger. Red indicates a prediction that a passenger died. Green indicates a prediction that a passenger survived. The intensity of the color indicates the magnitude of the prediction probability. For example: a bright green passenger represents a strong predicted probability for survival. We also plot the loss of our objective/loss function on the left of the table with &lt;a href=&quot;https://d3js.org/&quot;&gt;D3.js&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;This post aims to show how TensorFlow.js was used in a more realistic project than what can be found in the TensorFlow.js official tutorials — which tend to avoid the complexities of creating a user interface. If you are already well versed in modern frontend JavaScript development, and exclusively use a frontend framework like React, you may be interested in a &lt;a href=&quot;https://js.tensorflow.org/tutorials/mnist.html&quot;&gt;more direct tutorial&lt;/a&gt; that focuses mainly on TensorFlow.js.&lt;/p&gt;
+
+&lt;h1 id=&quot;dataset-and-modeling-overview&quot;&gt;&lt;a name=&quot;dmo&quot;&gt;Dataset and Modeling Overview&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;The &lt;a href=&quot;https://www.kaggle.com/c/titanic/data&quot;&gt;Titanic Dataset&lt;/a&gt; is a popular dataset for introducing the basics of machine learning due to its small size and ease of interpreting what sorts of features may be helpful to predicting survival. We are tasked with predicting the survival of a passenger when given the other bits of data that describe the passenger in the table. The columns we use to predict survival are called the &lt;strong&gt;predictive features&lt;/strong&gt;, traditionally labeled X. The column we are predicting is called the &lt;strong&gt;target label&lt;/strong&gt;, traditionally labeled y.  Here are a few rows of the dataset:&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10px; padding-right:10px;&quot;&gt;
+        
+&lt;table&gt;
+    &lt;thead&gt;
+        &lt;tr style=&quot;background-color: #d1d1d1;&quot;&gt;
+            &lt;th&gt;pclass&lt;/th&gt;
+            &lt;th&gt;survived&lt;/th&gt;
+            &lt;th&gt;&lt;span style=&quot;color: #000000; width:100px;&quot;&gt;name&lt;/span&gt;&lt;/th&gt;
+            &lt;th&gt;sex&lt;/th&gt;
+            &lt;th&gt;age&lt;/th&gt;
+            &lt;th&gt;sibsp&lt;/th&gt;
+            &lt;th&gt;parch&lt;/th&gt;
+            &lt;th&gt;ticket&lt;/th&gt;
+            &lt;th&gt;fare&lt;/th&gt;
+            &lt;th&gt;cabin&lt;/th&gt;
+            &lt;th&gt;embarked&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;1&lt;/td&gt;
+            &lt;td&gt;1&lt;/td&gt;
+            &lt;td&gt;Allen, Miss. Elisabeth Walton&lt;/td&gt;
+            &lt;td&gt;female&lt;/td&gt;
+            &lt;td&gt;29&lt;/td&gt;
+            &lt;td&gt;0&lt;/td&gt;
+            &lt;td&gt;0&lt;/td&gt;
+            &lt;td&gt;24160&lt;/td&gt;
+            &lt;td&gt;211.3375&lt;/td&gt;
+            &lt;td&gt;B5&lt;/td&gt;
+            &lt;td&gt;S&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;1&lt;/td&gt;
+            &lt;td&gt;1&lt;/td&gt;
+            &lt;td&gt;Allison, Master. Hudson Trevor&lt;/td&gt;
+            &lt;td&gt;male&lt;/td&gt;
+            &lt;td&gt;0.9167&lt;/td&gt;
+            &lt;td&gt;1&lt;/td&gt;
+            &lt;td&gt;2&lt;/td&gt;
+            &lt;td&gt;113781&lt;/td&gt;
+            &lt;td&gt;151.5500&lt;/td&gt;
+            &lt;td&gt;C22 C26&lt;/td&gt;
+            &lt;td&gt;S&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;1&lt;/td&gt;
+            &lt;td&gt;0&lt;/td&gt;
+            &lt;td&gt;Allison, Miss. Helen Loraine&lt;/td&gt;
+            &lt;td&gt;female&lt;/td&gt;
+            &lt;td&gt;2&lt;/td&gt;
+            &lt;td&gt;1&lt;/td&gt;
+            &lt;td&gt;2&lt;/td&gt;
+            &lt;td&gt;113781&lt;/td&gt;
+            &lt;td&gt;151.5500&lt;/td&gt;
+            &lt;td&gt;C22 C26&lt;/td&gt;
+            &lt;td&gt;S&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;1&lt;/td&gt;
+            &lt;td&gt;0&lt;/td&gt;
+            &lt;td&gt;Allison, Mr. Hudson Joshua Creighton&lt;/td&gt;
+            &lt;td&gt;male&lt;/td&gt;
+            &lt;td&gt;30&lt;/td&gt;
+            &lt;td&gt;1&lt;/td&gt;
+            &lt;td&gt;2&lt;/td&gt;
+            &lt;td&gt;113781&lt;/td&gt;
+            &lt;td&gt;151.5500&lt;/td&gt;
+            &lt;td&gt;C22 C26&lt;/td&gt;
+            &lt;td&gt;S&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;1&lt;/td&gt;
+            &lt;td&gt;0&lt;/td&gt;
+            &lt;td&gt;Allison, Mrs. Hudson J C (Bessie Waldo Daniels)&lt;/td&gt;
+            &lt;td&gt;female&lt;/td&gt;
+            &lt;td&gt;25&lt;/td&gt;
+            &lt;td&gt;1&lt;/td&gt;
+            &lt;td&gt;2&lt;/td&gt;
+            &lt;td&gt;113781&lt;/td&gt;
+            &lt;td&gt;151.5500&lt;/td&gt;
+            &lt;td&gt;C22 C26&lt;/td&gt;
+            &lt;td&gt;S&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;And here are the descriptions of each field:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Predictive Features ( X )
+    &lt;ul&gt;
+      &lt;li&gt;pclass: the class of the passenger (1st, 2nd, 3rd )&lt;/li&gt;
+      &lt;li&gt;name: the name on the ticket, which contains the last name first&lt;/li&gt;
+      &lt;li&gt;sex: the gender of the passenger (female,male)&lt;/li&gt;
+      &lt;li&gt;age: the age of the passenger.&lt;/li&gt;
+      &lt;li&gt;sibsp: the number of siblings or spouses aboard related to the passenger.&lt;/li&gt;
+      &lt;li&gt;parch: the number of parents or children aboard related to the passenger&lt;/li&gt;
+      &lt;li&gt;ticket: the passenger’s ticket number.&lt;/li&gt;
+      &lt;li&gt;fare: the dollar amount paid for the passengers ticket.&lt;/li&gt;
+      &lt;li&gt;cabin: the cabin the passenger was assigned to.&lt;/li&gt;
+      &lt;li&gt;embarked: the port of embarkation (C = Cherbourg, Q = Queenstown, S = Southampton)&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Target Label ( y )
+    &lt;ul&gt;
+      &lt;li&gt;survived: 1 if the passenger survived, 0 if the passenger died.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The full dataset has over 1,000 passenger rows, but for the sake of brevity let’s pretend the above table is the entirety of our dataset. We would then have the following matrix &lt;em&gt;X&lt;/em&gt; and row vector &lt;em&gt;y&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10px; padding-right:10px;&quot;&gt;
+        
+$$X=\left[\begin{matrix} 1 &amp;amp; \text{Allen, Miss. Elisabeth Walton} &amp;amp; \text{female} &amp;amp; 29 &amp;amp; 0 &amp;amp; 0 &amp;amp;  24160 &amp;amp; 211.3375  &amp;amp; \text{B5} &amp;amp; \text{S} \\ 1 &amp;amp; \text{Allison, Master. Hudson Trevor} &amp;amp; \text{male} &amp;amp; 0.9167 &amp;amp; 1 &amp;amp; 2 &amp;amp;  113781 &amp;amp; 151.5500  &amp;amp; \text{C22 C26} &amp;amp; \text{S} \\ 1 &amp;amp; \text{Allison, Miss. Helen Loraine} &amp;amp; \text{female} &amp;amp; 2 &amp;amp; 1 &amp;amp; 2 &amp;amp;  113781 &amp;amp; 151.5500  &amp;amp; \text{C22 C26} &amp;amp; \text{S} \\ 1 &amp;amp; \text{Allison, Mr. Hudson Joshua Creighton} &amp;amp; \text{male} &amp;amp; 30 &amp;amp; 1 &amp;amp; 2 &amp;amp;  113781 &amp;amp; 151.5500  &amp;amp; \text{C22 C26} &amp;amp; \text{S} \\ 1 &amp;amp; \text{Allison, Mrs. Hudson J C (Bessie Waldo Daniels)} &amp;amp; \text{female} &amp;amp; 25 &amp;amp; 1 &amp;amp; 2 &amp;amp;  113781 &amp;amp; 151.5500  &amp;amp; \text{C22 C26} &amp;amp; \text{S} \\ \end{matrix}\right]$$
+
+$$y=\left[\begin{matrix} 1 \\ 1 \\ 0 \\ 0 \\ 0 \end{matrix}\right]$$
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Neural networks, in a more technical sense, provide a robust framework for nonlinear &lt;a href=&quot;https://en.wikipedia.org/wiki/Universal_approximation_theorem&quot;&gt;function approximation&lt;/a&gt;. The problem of predicting the survival of the passengers &lt;em&gt;y&lt;/em&gt; given the passenger features &lt;em&gt;X&lt;/em&gt; can be formulated as finding a function such that:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\Huge\begin{aligned} f( \mathbf{X})=y \end{aligned}&lt;/script&gt;
+
+&lt;p&gt;In the case of neural networks we learn this function and the process of learning it is called &lt;strong&gt;training&lt;/strong&gt;. In all non-trivial problems we can only approximate this function and in practice we never actually want to find the precise function that satisfies this equation; because if we do, we are most likely to have found a function that memorizes the dataset and does not represent a function that will accurately predict &lt;em&gt;y&lt;/em&gt; given &lt;em&gt;X&lt;/em&gt; on data it has not trained on. The ability to make good predictions on data we have not trained on is called &lt;a href=&quot;https://en.wikipedia.org/wiki/Generalization_error&quot;&gt;generalization&lt;/a&gt; and is largely related to the &lt;a href=&quot;https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff&quot;&gt;bias-variance problem&lt;/a&gt;. Being a deep learning practitioner requires you to construct neural network architectures that approximate these types of functions while also generalizing well to unseen data.&lt;/p&gt;
+
+&lt;h1 id=&quot;project-setup&quot;&gt;&lt;a name=&quot;ps&quot;&gt;Project Setup&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;We use the &lt;a href=&quot;https://webpack.js.org/&quot;&gt;webpack bundler&lt;/a&gt; to bundle our JavaScript source code for distribution and the &lt;a href=&quot;https://webpack.js.org/configuration/dev-server/&quot;&gt;webpack dev server&lt;/a&gt; for development so that we do not have to manually bundle our code every time we make a change in development.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+&lt;div class=&quot;flex-container center&quot;&gt;
+&lt;div&gt;
+    &lt;img src=&quot;http://kexp.io/wp-content/uploads/2018/07/kkk-1-554x1024.jpg&quot; alt=&quot;&quot; width=&quot;237&quot; height=&quot;472&quot; /&gt;
+&lt;/div&gt;
+&lt;div style=&quot;width:40%; padding-left:20px;&quot;&gt;
+On the left we see a layout of the project files. &lt;br /&gt;&lt;br /&gt;
+
+&lt;b&gt;./data/&lt;/b&gt; : we have a csv containing the titanic dataset. &lt;br /&gt;&lt;br /&gt;
+
+&lt;b&gt;./dist/&lt;/b&gt;: this is the distribution folder that will be the target of our webpack bundle. &lt;br /&gt;&lt;br /&gt;
+
+&lt;b&gt;./src/&lt;/b&gt;: here we have the JavaScript and CSS source code. &lt;br /&gt;&lt;br /&gt;
+
+&lt;b&gt;./static/&lt;/b&gt; : here are the static assets, which in this case is just our logo and favicon.  &lt;br /&gt;&lt;br /&gt;
+
+
+This repo is a npm package defined by the package.json file and we store our scripts (build,dev) for working with the project and a list relevant dependencies there. We also have a webpack.config.js file for configuring how webpack should work on this project. 
+&lt;/div&gt;
+&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;To get started with this project, do the following:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Install &lt;a href=&quot;https://nodejs.org/en/&quot;&gt;Node.js&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/Andrewnetwork/NeuralTitanic&quot;&gt;Clone or download this repo&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;Open a terminal and cd into your copy of the repo.&lt;/li&gt;
+  &lt;li&gt;In your terminal type: npm install&lt;/li&gt;
+  &lt;li&gt;Launch the dev server by typing: npm run dev&lt;/li&gt;
+  &lt;li&gt;Click on the url shown in the terminal or enter http://localhost:8080/ in your web browser.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;On step #4 you use npm to install the project dependencies listed in package.json. On step #5 you launch the dev server which displays a URL you should click in step #6. At this point, whenever you save a modification to the source code it will prompt the development server to refresh the web page you have open and will display your changes immediately.&lt;/p&gt;
+
+&lt;p&gt;When you are ready to bundle your code for serving, simply run &lt;strong&gt;npm run build&lt;/strong&gt; and it will produce the files you can put on your web server in the &lt;strong&gt;./dist/&lt;/strong&gt; folder.&lt;/p&gt;
+
+&lt;p&gt;Now that you have the code and ability to make changes and quickly see the results, let’s look at the important pieces of code.&lt;/p&gt;
+
+&lt;h1 id=&quot;the-code&quot;&gt;&lt;a name=&quot;code&quot;&gt;The Code&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;Here we provide extended documentation and commentary for the critical code of the project. If you already know modern fronted JavaScript development well,you may want to skip to &lt;em&gt;modeling.js&lt;/em&gt; and &lt;em&gt;preprocessing.js&lt;/em&gt;. I skip certain parts of the code that are dry and would be tiresome to explain. Clone the &lt;a href=&quot;https://github.com/Andrewnetwork/NeuralTitanic&quot;&gt;repo&lt;/a&gt; for this project to get all the code.&lt;/p&gt;
+
+&lt;h3 id=&quot;indexhtml&quot;&gt;index.html&lt;/h3&gt;
+&lt;p&gt;Here we define the HTML template for the application. It has many extraneous things related to the description section, but I will point out a few key parts. There are a few main containers in the HTML template we modify with our JavaScript code:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;em&gt;#trainingCurves&lt;/em&gt;: the loss function svg container.&lt;/li&gt;
+  &lt;li&gt;&lt;em&gt;#modelParameters&lt;/em&gt;: the container for the model parameter input elements.&lt;/li&gt;
+  &lt;li&gt;&lt;em&gt;#trainBttnContainer&lt;/em&gt;: the container for the start/stop training button.&lt;/li&gt;
+  &lt;li&gt;&lt;em&gt;#tableControls&lt;/em&gt;: container for the sorting selection menu.&lt;/li&gt;
+  &lt;li&gt;&lt;em&gt;#dat&lt;/em&gt;: container for the table data.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;At the bottom of the file you will notice the following:&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;script &lt;/span&gt;&lt;span class=&quot;na&quot;&gt;src=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;bundle.js&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This includes the JavaScript and CSS code bundled by webpack.&lt;/p&gt;
+
+&lt;h3 id=&quot;indexjs&quot;&gt;index.js&lt;/h3&gt;
+&lt;p&gt;This is our application’s entry point. The code in this file kicks off the rest of the application.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'d3'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'bootstrap'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'./scss/app.scss'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createTrainBttn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;makeTable&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createSortByMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attachChangeParameterHandler&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'./ui'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;startTraining&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'./events'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;We use &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import&quot;&gt;ES6 import statements&lt;/a&gt; to import other JavaScript modules and the CSS which is also bundled with the rest of our code. Bundling CSS with JavaScript is not particularly best practice, but will suit our purpose. See &lt;a href=&quot;https://webpack.js.org/guides/code-splitting/&quot;&gt;this link&lt;/a&gt; for more information on splitting your dependencies.&lt;/p&gt;
+
+&lt;p&gt;After the these imports we have inside the main function the following code:&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;dsv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;,&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;data/titanicData.csv&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; 
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;then&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; 
+    &lt;span class=&quot;nx&quot;&gt;createTrainBttn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;train&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;createSortByMenu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;startTraining&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;makeTable&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
+    &lt;span class=&quot;nx&quot;&gt;attachChangeParameterHandler&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Here we use &lt;a href=&quot;https://d3js.org/&quot;&gt;D3.js&lt;/a&gt;, as imported above, to load a CSV file titanicData.csv containing the titanic dataset. After the CSV is loaded, it triggers the attached then function which: instantiates parts of the user interface ( createTrainBttn, createSortByMenu, attachChangeParameterHandler), initiates the training ( startTraining ), and displays the data in a table (makeTable). As you can see, each function is passed a reference to the loaded data. I have tried to make this particular project as &lt;a href=&quot;https://en.wikipedia.org/wiki/Functional_programming&quot;&gt;functional&lt;/a&gt; as possible; which means I typically try to avoid global variables and reconstruct elements of the UI when they change. This was a design decision I made to reduce the need for a &lt;a href=&quot;https://redux.js.org/&quot;&gt;state management system&lt;/a&gt;, but would undoubtedly become cumbersome in a more complex project.&lt;/p&gt;
+
+&lt;h3 id=&quot;uijs&quot;&gt;ui.js&lt;/h3&gt;
+&lt;p&gt;This module is responsible for handling the user interface functionality. It is rather primitive with respect to some other applications which use frameworks like &lt;a href=&quot;https://reactjs.org/&quot;&gt;React&lt;/a&gt;, but for this reason, it is hoped that it has less intellectual overhead and is easier for newcomers to understand.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;svg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;#trainingCurves&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;svg&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;margin&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;top&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;right&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;bottom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;left&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;width&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;svg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;width&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;left&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;right&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;height&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;svg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;height&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;top&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;bottom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Here we define constants defined within this module’s scope for the properties of the svg canvas we use to plot the loss function. Only code in this module can access these variables because we do not use the keyword &lt;em&gt;export&lt;/em&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;k&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;createTrainBttn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;titanicData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// Select the button. &lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;bttn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;#trainBttnContainer&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;button&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
     
-      <item>
-        <title>Example Post</title>
-        <description>&lt;p&gt;This is an example post. Please remove it and add your own content.&lt;/p&gt;
+    &lt;span class=&quot;c1&quot;&gt;// If there is no button, create one. &lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;bttn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()){&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;bttn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;#trainBttnContainer&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;button&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 
-&lt;p&gt;Fix looked intently at his companion, whose countenance was as serene as possible, and laughed with him. But Passepartout persisted in chaffing him by asking him if he made much by his present occupation.&lt;/p&gt;
+    &lt;span class=&quot;c1&quot;&gt;// Change the button state based on the input argument state. &lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;train&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// Make the button the start training button. &lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;bttn&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;id&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;startBttn&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;class&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;btn btn-success btn-lg&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;click&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;startTraining&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;titanicData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Start Training&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// Make the button the stop training button. &lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;bttn&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;id&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;startBttn&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;class&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;btn btn-danger btn-lg&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;click&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;stopTraining&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;titanicData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Stop Training&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;Ah, if you would only go on with us! An agent of the Peninsular Company, you know, can’t stop on the way! You were only going to Bombay, and here you are in China. America is not far off, and from America to Europe is only a step.&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;javascript
-var s = &quot;JavaScript syntax highlighting&quot;;
-alert(s);
-&lt;/code&gt;&lt;/p&gt;
-</description>
-        <pubDate>Thu, 18 Sep 2014 00:00:00 -0400</pubDate>
-        <link>https://foo_bar.github.io/test/2014/09/18/example-post/</link>
-        <guid isPermaLink="true">https://foo_bar.github.io/test/2014/09/18/example-post/</guid>
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Here we handle the logic for changing the state of the start/stop training button. The only seemingly odd part here is that when we attach the event handler with the on function, we create an &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions&quot;&gt;ES6 lambda function&lt;/a&gt;. This is done so we can pass along the data variable needed for those functions. This is another design choice made to reduce the need for global variables.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
         
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;k&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;blankTrainingPlot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;#trainingCurves&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;svg&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;selectAll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;*&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;remove&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+
+    &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;#trainingCurves&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;svg&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;text&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;style&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;font&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;bold 30px sans-serif&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;x&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;48&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;y&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;160&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;fill&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;rgba(57, 57, 121, 0.692)&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Start Training&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;This function clears the loss function plot and draws the text “Start Training”.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
         
-        <category>test</category>
-        
-      </item>
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;predToColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pred&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;color&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;0,0,0&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;alpha&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
     
-  </channel>
-</rss>
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pred&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// More probable to die. &lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;color&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;255,0,0&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pred&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// More probable to survive. &lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;color&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;0,255,0&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pred&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;rgba(&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;,&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;)&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This function produces the appropriate color for a prediction that we use in the next section to color the table rows. We will see later that our neural network predicts a value [0,1]. The closer this value is to 0, the more the network believes the passenger has died. Likewise, the closer the value is to 1, the more the network believes the passenger has survived. A predicted value of 0.5 represents maximum uncertainty.  Thus, if the predicted value is less that this threshold of 0.5, we output a red cell with an alpha ( transparency level ) that is proportional to how strong the network predicts death (i.e. dark red represents a strong prediction of passenger death ). The same logic is applied to the survival case.&lt;/p&gt;
+
+&lt;p&gt;What does &lt;em&gt;predToColor(0.1)&lt;/em&gt; produce? 0.1 &amp;lt; 0.5 so we will be producing a red color. What about the alpha?&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+$$\Large\begin{aligned}\text{alpha} = (0.5-0.1)*2 = 0.4*2 = 0.8\end{aligned}$$
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Thus we produce a very strong red color: &lt;em&gt;predToColor(0.1)&lt;/em&gt; = &lt;em&gt;“rgba(255,0,0,0.8)”&lt;/em&gt;. This color would then be used to color the corresponding row in the table corresponding to passenger the neural network made a prediction on.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Question for you&lt;/strong&gt;: Why do we process the alpha values in this way? Why don’t we simply use the predicted value as the alpha value?&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;k&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;updatePredictions&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;predictions&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;predColor&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;predictions&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;predToColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;#dat&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;table&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;tbody&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;selectAll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;tr&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;predColor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;style&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;background-color&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Here we actually use &lt;em&gt;predToColor&lt;/em&gt; defined in the previous snippet to color the table rows. The input to this function is an array of predictions for all the rows in the table. We map &lt;em&gt;predToColor&lt;/em&gt; over all these predictions and get an array of corresponding color values. We then use d3 to iterate over the table and update the background-color of each cell with the new prediction colors.  Here you can see the elegance of &lt;a href=&quot;https://bost.ocks.org/mike/selection/&quot;&gt;d3’s data binding functionality&lt;/a&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;k&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;plotLoss&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;lossData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;accuracy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// Modified from: https://bl.ocks.org/mbostock/3883245&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;g&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;svg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;g&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lossText&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;svg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;text&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;scaleLinear&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rangeRound&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;scaleLinear&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rangeRound&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;lossData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;zip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;lossData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;lossData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;line&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;line&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+
+    &lt;span class=&quot;nx&quot;&gt;g&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;path&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;datum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;fill&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;none&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;stroke&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;steelblue&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;stroke-linejoin&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;round&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;stroke-linecap&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;round&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;stroke-width&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;d&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;line&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    
+    &lt;span class=&quot;nx&quot;&gt;lossText&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Loss: &quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;lossData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;lossData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toFixed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot; | Accuracy: &quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;accuracy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toFixed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;%&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This is the D3 code that plots the loss curve. It is called from the training process which we will look at shortly. It is passed an array of loss values of the neural network over the training epochs and the current epoch accuracy. I cannot go into the full details of D3 in this post. Please see the &lt;a href=&quot;https://d3js.org/#introduction&quot;&gt;introduction to D3.js&lt;/a&gt; if you’d like to understand this code more.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;k&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;makeTable&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;#dat&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;selectAll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;*&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;remove&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// Create Table &lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;table&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;#dat&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;table&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;class&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;table&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  
+    &lt;span class=&quot;c1&quot;&gt;// Create Table Header&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;table&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;thead&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;tr&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;selectAll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'th'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;columns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;enter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;th&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;column&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;column&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+  
+    &lt;span class=&quot;c1&quot;&gt;// Populate Table&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;table&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;tbody&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;selectAll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;tr&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;enter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;tr&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;selectAll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;td&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);}).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;enter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;td&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;exit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Another bit of d3 code that creates the HTML table from the csv data loaded above in the index.js snippet.&lt;/p&gt;
+
+&lt;h3 id=&quot;preprocessingjs&quot;&gt;preprocessing.js&lt;/h3&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;prepTitanicRow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sex&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;embarked&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pclass&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;age&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;age&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sibsp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;sibsp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;parch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;parch&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fare&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;fare&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// Process Categorical Variables &lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;sex&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;male&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;sex&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;sex&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;female&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;sex&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;embarked&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;S&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;embarked&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;embarked&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;C&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;embarked&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;embarked&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Q&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;embarked&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Pclass&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;pclass&lt;/span&gt;   &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Pclass&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;pclass&lt;/span&gt;   &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Pclass&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;pclass&lt;/span&gt;   &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// Process Quantitative Variables&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;parseFloat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;age&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;NaN&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;age&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;parseFloat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sibsp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;NaN&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;sibsp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;parseFloat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;parch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;NaN&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;parch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;parseFloat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fare&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;NaN&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;fare&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pclass&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;concat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;concat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;age&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sibsp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;parch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fare&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;concat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;embarked&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This is the code for preprocessing each row of the titanic dataset; which simply consists of turning categorical variables into a &lt;a href=&quot;https://en.wikipedia.org/wiki/One-hot&quot;&gt;one-hot representation&lt;/a&gt; and setting &lt;em&gt;NaN&lt;/em&gt; values to 0. There are more elegant means of preprocessing, including methods like infilling &lt;em&gt;NaNs&lt;/em&gt;, and you may notice that we omit several fields in the data that would be harder to process such as &lt;em&gt;name&lt;/em&gt;. This was done to simplify the code, as this project was originally created from some teaching materials I prepared. Feel free to figure out how you may want to include the omitted features for better predictions.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;k&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;titanicPreprocess&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;X&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;prepTitanicRow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;survived&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Here we map the preprocessing function &lt;em&gt;prepTitanicRow&lt;/em&gt; over each row of the data. The output of this function is the feature matrix &lt;em&gt;X&lt;/em&gt; and target vector &lt;em&gt;y&lt;/em&gt; as described above.&lt;/p&gt;
+
+&lt;p&gt;Now that we have described the main parts of the boring side of the application, let’s actually look at the neural network part.&lt;/p&gt;
+
+&lt;h3 id=&quot;modelingjs&quot;&gt;modeling.js&lt;/h3&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;k&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;createModel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;actFn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;nNeurons&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;initStrat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;leCunNormal&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sequential&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;add&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;layers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;dense&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;units&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;nNeurons&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;activation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;actFn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;kernelInitializer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;initStrat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;inputShape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]}));&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;add&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;layers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;dense&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;units&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;activation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;sigmoid&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;kernelInitializer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;initStrat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}));&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;compile&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;optimizer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;adam&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;loss&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;losses&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;logLoss&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;We have finally come to the point where we make our little single layer neural network. The creation of the network is parameterized by the variables &lt;em&gt;actFn&lt;/em&gt; and &lt;em&gt;nNeurons&lt;/em&gt; set by the user in the user interface. You may notice that the number of inputs to our network outnumber the number of features we actually have. This is because we expand the dimensionality of the feature space in the preprocessing step above; i.e. instead of having a single input for the port of embarkation, we now have a one-hot vector of length 3. Will will go through this code line by line, but before we do, here’s a visual of what the network looks like:&lt;/p&gt;
+
+&lt;div class=&quot;figure&quot;&gt;
+    &lt;img style=&quot;&quot; src=&quot;http://localhost:4000/assets/images/2018/pbtfjs/net.png&quot; /&gt;
+    &lt;div class=&quot;desc&quot; style=&quot;font-size: ;&quot;&gt;Single hidden layer feed forward neural network&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;initStrat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;leCunNormal&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The connections, called edges, you see in the network are weighted, and adjusting these weights is what we do when we train the network. Since our training is iterative, we must have some initial state for the weights. The scheme we use for setting the initial state of the weights is called the initialization strategy. Typically you could avoid explicitly stating an initialization strategy because the default &lt;strong&gt;initialization strategy&lt;/strong&gt; used by TensorFlow of sampling the initial weights from a uniform distribution works well enough in many cases, but for many other cases the initial state of these weights highly influences the performance of the network. Since we have a very small dataset, the performance of our network is highly dependent upon the initial state of the weights. Due to this, I have chosen an initialization strategy that produces more consistent results in this case.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sequential&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The sequential model object is what we will use to build our model. A sequential model simply means that when we add layers to the model, they will be stacked sequentially like shown in the network diagram above.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;add&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;layers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;dense&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;units&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;nNeurons&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;activation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;actFn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;kernelInitializer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;initStrat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;inputShape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]}));&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Here we implicitly add the input layer ( of size 12 ) and add the hidden densely connected layer to the network. A densely connected layer simply means that every neuron in the layer will be connected to every neuron in the layer before it. In our case, the hidden layer is attached to an input layer, so every neuron in the hidden layer is connected to every input in the input layer. These inputs are represented in the diagram above as circles like the neurons, but it is important to note that these are inputs not neurons; however, they are still connected to the elements in the hidden layer as two layers of neurons would be connected.&lt;/p&gt;
+
+&lt;p&gt;The dense layer takes in a dictionary of arguments defining the layer. &lt;a href=&quot;https://js.tensorflow.org/api/0.11.7/#layers.dense&quot;&gt;There are many such arguments&lt;/a&gt;,but we only need to provide the arguments which we require to be different from the default arguments:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;units&lt;/strong&gt;: The number of neurons. As we showed above, this parameter is adjustable by the user from the user interface.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;activation&lt;/strong&gt;: The activation function for each of the neurons in this layer. Again, this is something that is set by the user in the ui. A full discussion on activation functions is outside the scope of this piece, but I encourage you to play with the demo and see how changing the activation function changes the predictions before delving into the formal theory of these things.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;kernelInitializer&lt;/strong&gt;: We set this above and discussed its purpose.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;inputShape&lt;/strong&gt;: This is the size of the implicitly created input layer. In our case, we have an input layer of 12 units.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;add&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;layers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;dense&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;units&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;activation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;sigmoid&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;kernelInitializer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;initStrat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}));&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This is the last layer of our network, which is simply a single output neuron that is densely connected to the hidden layer. We use a sigmoid function as the activation for this unit because we want our network to predict a probability for passenger survival [0,1] and this is precisely the range of the &lt;a href=&quot;https://en.wikipedia.org/wiki/Sigmoid_function&quot;&gt;sigmoid function&lt;/a&gt;. There are other functions with this range, of course, and a natural question you may have is: “Why use this function over others for predicting a probability?” While an answer to this question is beyond the scope of this piece, I will say to those inquiring minds that the use of the sigmoid function comes from the heritage of &lt;a href=&quot;https://en.wikipedia.org/wiki/Logistic_regression&quot;&gt;logistic regression&lt;/a&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;compile&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;optimizer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;adam&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;loss&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;losses&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;logLoss&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;In the steps prior, we have setup the network architecture, but have not actually made the model. When we compile a neural network in TensorFlow, we actually produce the network. You will typically supply two arguments to the network compiler:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;optimizer&lt;/strong&gt;: This is the optimization algorithm we use during training. At the risk of bringing the flames of the ML community to my rear, I will say that if you are a novice, just use &lt;a href=&quot;https://arxiv.org/abs/1412.6980&quot;&gt;Adam&lt;/a&gt;. It is very important to understand [how these optimizers work]((http://www.deeplearningbook.org/contents/optimization.html) when you are doing machine learning research because when certain problems occur you must be able to reason about all the parts of the network and training process, but for a newcomer, Adam will work consistently enough for you not to worry until you really get into hard problems.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;loss&lt;/strong&gt;: The loss function demands more of your attention, as different modeling problems require different loss functions. A loss function tells us how to measure the discrepancy between our model’s predictions and actual target values.  We use this measure of error to train our network in conjunction with the optimizer and &lt;a href=&quot;https://en.wikipedia.org/wiki/Backpropagation&quot;&gt;back-propagation&lt;/a&gt;. In the case of modeling probability, you will typically use a variant of &lt;a href=&quot;https://en.m.wikipedia.org/wiki/Cross_entropy&quot;&gt;cross-entropy loss&lt;/a&gt;, as is log loss.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;After having dealt with the complexities of the user interface and creating the model, what’s left? We now must tackle the actual training of the model.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10%; padding-right:10%;&quot;&gt;
+        
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;k&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;trainModel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;trainState&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// Disable Form Inputs &lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;#modelParameters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;selectAll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;.form-control&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'disabled'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'disabled'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;#tableControls&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;selectAll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;.form-control&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'disabled'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'disabled'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// Create Model&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;createModel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;#activationFunction&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;property&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;value&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+                              &lt;span class=&quot;nb&quot;&gt;parseInt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;#nNeurons&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;property&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;value&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)));&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// Preprocess Data&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;cleanedData&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;titanicPreprocess&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;X&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;cleanedData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;cleanedData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// Train Model&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lossValues&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[];&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lastBatchLoss&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// Get Hyperparameter Settings&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;epochs&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;#epochs&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;property&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;value&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;batchSize&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;#batchSize&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;property&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;value&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    
+    &lt;span class=&quot;c1&quot;&gt;// Init training curve plotting. &lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;initPlot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;epoch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;epoch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;epochs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;trainState&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;epoch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;trainState&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+                &lt;span class=&quot;c1&quot;&gt;// Select Batch&lt;/span&gt;
+                &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;xs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tidy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;xs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;slice&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;batchSize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;batchSize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+                    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ys&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;slice&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;batchSize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;batchSize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+                    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;xs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+                &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+
+                &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;history&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;xs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;batchSize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;batchSize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;epochs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;lastBatchLoss&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;history&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;history&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;loss&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+                &lt;span class=&quot;nx&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;dispose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;xs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;
+                &lt;span class=&quot;kr&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;nextFrame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+            &lt;span class=&quot;c1&quot;&gt;// End of epoch. &lt;/span&gt;
+            &lt;span class=&quot;c1&quot;&gt;//console.log(&quot;Epoch &quot;+epoch+&quot;/&quot;+epochs+&quot; ended.&quot;);&lt;/span&gt;
+            &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;xs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pred&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;predict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;xs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;dataSync&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+            &lt;span class=&quot;nx&quot;&gt;updatePredictions&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pred&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+            &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;accuracy&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;zip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pred&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;round&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pred&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+            &lt;span class=&quot;nx&quot;&gt;lossValues&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;push&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;lastBatchLoss&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;nx&quot;&gt;plotLoss&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;lossValues&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;accuracy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;trainState&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;createTrainBttn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;train&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;End Training&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// Enable Form Controls&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;#modelParameters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;selectAll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;.form-control&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'disabled'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;d3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;#tableControls&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;selectAll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;.form-control&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'disabled'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Before getting into this, I will define some terms used:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Epoch&lt;/strong&gt;: training a model on one the entirety of the dataset once. Those coming from non-stochastic modeling backgrounds may find the process of &lt;a href=&quot;https://en.wikipedia.org/wiki/Stochastic_optimization&quot;&gt;stochastic optimization&lt;/a&gt; very strange at first, but the idea is quite natural to us. When you first study a subject, do you understand it completely without iteration? Of course not; we must constantly work at improving our understanding. Even though all the subject material may be presented at once, we need to go over it multiple times to understand it.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Mini-Batch&lt;/strong&gt;: a subset of the full training data. During each epoch, we split the training data into smaller batches to train on. To continue the analogy started above, when you learn something like mathematics, you approximate a general understanding of mathematics by studying different parts. It would be impossible for us to learn all of mathematics at once, given our limited capacity.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Here what’s happening at a high level in this function:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Create the neural network.&lt;/li&gt;
+  &lt;li&gt;Preprocess the data.&lt;/li&gt;
+  &lt;li&gt;Epoch Loop: Train network for the number of epochs set by the user.
+    &lt;ol&gt;
+      &lt;li&gt;Mini-Batch Loop: While we still have data to train on in the current epoch and the user hasn’t stopped the training.
+        &lt;ol&gt;
+          &lt;li&gt;Train the model on a mini-batch.&lt;/li&gt;
+        &lt;/ol&gt;
+      &lt;/li&gt;
+      &lt;li&gt;End of epoch: Now that we have further trained the model, we make new predictions on the data and update the predictions using the user interface function &lt;em&gt;updatePredictions&lt;/em&gt;.&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Going over this code line by line would be tedious for both you and I, so I will address some key points and questions that will likely puzzle you and puzzled me.&lt;/p&gt;
+
+&lt;h4 id=&quot;whats-with-async-and-await&quot;&gt;What’s with “async” and “await”?&lt;/h4&gt;
+
+&lt;p&gt;This is the part of ES6 which allows us to define asynchronous functions. We use await when training the model because that too is an asynchronous function and would like to wait for it to finish training before moving onto the next epoch.&lt;/p&gt;
+
+&lt;h4 id=&quot;tftidy-and-tfdispose&quot;&gt;tf.tidy and tf.dispose?&lt;/h4&gt;
+&lt;p&gt;These functions are involved with the garbage collection of the tensors created. You should read about the &lt;a href=&quot;https://js.tensorflow.org/tutorials/core-concepts.html&quot;&gt;core concepts in TensorFlow.js&lt;/a&gt; for more detail.&lt;/p&gt;
+
+&lt;h4 id=&quot;await-tfnextframe&quot;&gt;await tf.nextFrame();&lt;/h4&gt;
+&lt;p&gt;Without this bit, the training of the model would freeze your browser. This function is &lt;a href=&quot;https://js.tensorflow.org/api/0.11.7/#nextFrame&quot;&gt;sparsely documented&lt;/a&gt; and is most likely a product of TensorFlow.js being in early development. I would expect future versions to mitigate the need to explicitly call this function.  Figuring out where to use this function caused me the most frustration in this project.&lt;/p&gt;
+
+&lt;h4 id=&quot;tftensor-and-datasync&quot;&gt;tf.tensor() and dataSync();&lt;/h4&gt;
+&lt;p&gt;Because our data is stored in standard JavaScript arrays, we need to convert them to TensorFlow’s tensor format with &lt;em&gt;tf.tensor()&lt;/em&gt;. When we want to go the other way, from tensor to JavaScript array, we call the &lt;em&gt;dataSync()&lt;/em&gt; function of a tensor.&lt;/p&gt;
+
+&lt;h1 id=&quot;summary&quot;&gt;&lt;a name=&quot;sum&quot;&gt;Summary&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;In this article we discussed a complete modern JavaScript project that uses TensorFlow.js to visualize the evolving predictions of a single layer neural network as it is being trained on the tabular &lt;a href=&quot;https://www.kaggle.com/c/titanic&quot;&gt;Titanic Dataset&lt;/a&gt; for the task of binary classification of passenger survival. We hope that this will help you understand how you can use TensorFlow.js in your projects. If this is your first experience with TensorFlow or neural networks, please consider checking out the following resources for a more comprehensive coverage of the essentials:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://js.tensorflow.org/tutorials/core-concepts.html&quot;&gt;Core Concepts in TensorFlow.js&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://www.deeplearningbook.org/&quot;&gt;The Deep Learning Book&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name></name></author><summary type="html">In this post we introduce how to use TensorFlow.js by demonstrating how it was used in the simple project Neural Titanic. In this project, we show how to visualize the evolution of the predictions of a single layer neural network as it is being trained on the tabular Titanic Dataset for the task of binary classification of passenger survival</summary></entry><entry><title type="html">First Intuitions of Homotopy Type Theory (HoTT)</title><link href="http://localhost:4000/minor/math/2017/07/29/hotti.html" rel="alternate" type="text/html" title="First Intuitions of Homotopy Type Theory (HoTT)" /><published>2017-07-29T12:20:24-04:00</published><updated>2017-07-29T12:20:24-04:00</updated><id>http://localhost:4000/minor/math/2017/07/29/hotti</id><content type="html" xml:base="http://localhost:4000/minor/math/2017/07/29/hotti.html">&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10px; padding-right:10px;&quot;&gt;
+        
+&lt;div class=&quot;figure&quot;&gt;
+    &lt;img style=&quot;&quot; src=&quot;http://localhost:4000/assets/images/2017/foundationalFathers.png/&quot; /&gt;
+    &lt;div class=&quot;desc&quot; style=&quot;font-size: ;&quot;&gt;Foundational Fathers&lt;/div&gt;
+&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;What is a problem? A problem is a partial statement with high ambiguity. Solving a problem is akin to defining it rigorously. When we translate this reasoning into mathematics, we get the &lt;a href=&quot;https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence&quot;&gt;Curry–Howard Correspondence&lt;/a&gt;. This, I believe, is one of the most appealing aspects of Homotopy Type Theory(HoTT) and constructive mathematics in general. Consider the toy example of “Why does a ball roll down a hill?” If you started to expand your definitions, you’d answer the question — if we define what “roll down,” “ball,” and “hill,” the answer falls out at us. In a way we construct the solution to the problem by defining it. As another example, in software we experience this all the time. A client gives us a high level functional specification of a software system which we as programmers must turn into a rigorous definition via code. In fact, type theory and programming languages are &lt;a href=&quot;https://mitpress.mit.edu/books/types-and-programming-languages&quot;&gt;intimately related&lt;/a&gt;. The other appealing thing about HoTT for me is that its fundamental objects, homotopy types, have a spacial interpretation which lends itself intuitively to many diverse problems.&lt;/p&gt;
+
+&lt;p&gt;When I first started reading the &lt;a href=&quot;https://homotopytypetheory.org/book/&quot;&gt;HoTT Book&lt;/a&gt; a lot of intuition alarm bells started going off, especially in respect to modern machine learning.&lt;/p&gt;
+
+&lt;p&gt;The topological interpretation of type theory that &lt;a href=&quot;https://en.wikipedia.org/wiki/Homotopy&quot;&gt;homotopy&lt;/a&gt; types gives us is strikingly relevant to neural networks. Neural networks are &lt;a href=&quot;http://neuralnetworksanddeeplearning.com/chap4.html&quot;&gt;universal function approximators&lt;/a&gt;. Functions, given the co-domain and domain, define a particular type of space. When we train the parameters of a neural network by feeding it data, we slowly shape a space that gets closer and closer to the function that produced the input data.  Some topological process is taking place in neural network learning. I believe with HoTT serving as a replacement for the foundations of mathematics which formulations of set theory like &lt;a href=&quot;https://en.wikipedia.org/wiki/Zermelo-Fraenkel_set_theory&quot;&gt;ZFS&lt;/a&gt;  has served, which both have roots in avoiding &lt;a href=&quot;https://en.wikipedia.org/wiki/Russell%27s_paradox&quot;&gt;Russell’s Paradox&lt;/a&gt;, we will gain a tool set for solving problems that is more in line with our intuitions and were previously muddled town by set theoretic formulations. Just like different branches of mathematics have evolved to study different mathematical objects which lend themselves to formulating and solving different problems. Sure you can encode a graph theory problem in set theory, but sometimes our intuition can just make larger strides when reasoning about vertices and edges. Alan Turning’s &lt;a href=&quot;https://en.wikipedia.org/wiki/Turing_machine&quot;&gt;Turing Machines&lt;/a&gt; and Church’s &lt;a href=&quot;https://en.wikipedia.org/wiki/Lambda_calculus&quot;&gt;Lambda Calculus&lt;/a&gt; offer us another example of different but equivalent foundations (via the &lt;a href=&quot;https://en.wikipedia.org/wiki/Church%E2%80%93Turing_thesis&quot;&gt;Church-Turing Thesis&lt;/a&gt; ) that lend themselves to reasoning about a domain in different ways.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10px; padding-right:10px;&quot;&gt;
+        
+&lt;div class=&quot;figure&quot;&gt;
+    &lt;img style=&quot;&quot; src=&quot;http://localhost:4000/assets/images/2017/nn.png/&quot; /&gt;
+    &lt;div class=&quot;desc&quot; style=&quot;font-size: ;&quot;&gt;An example simple feed-forward neural network AKA Multi-Layer Perception&lt;/div&gt;
+&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Neural networks have been vastly expanded since their original conception. Now we have all sorts of neural networks for doing different things. I’ve spent the last year studying different neural networks because they have been in most ground breaking research papers. One of the main issues everyone brings up at conferences or at meetups when neural networks are discussed is that they don’t have a rigorous mathematical theory supporting them, which leads to people feeling uneasy about trusting the learned results because the result of the learning process is a matrix of weights that cannot be reasoned with easily. We can only statistically check for overall error in tasks like classification. Among others, there is an ongoing effort by DARPA called &lt;a href=&quot;https://www.darpa.mil/program/explainable-artificial-intelligence&quot;&gt;eXplainable AI (XAI)&lt;/a&gt; which aims to produce a new breed of system that enables us to reason with the results of the learning process.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10px; padding-right:10px;&quot;&gt;
+        
+&lt;div class=&quot;figure&quot;&gt;
+    &lt;img style=&quot;&quot; src=&quot;http://localhost:4000/assets/images/2017/xai.jpg/&quot; /&gt;
+    &lt;div class=&quot;desc&quot; style=&quot;font-size: ;&quot;&gt;An overview of XAI goals&lt;/div&gt;
+&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;In sum, I’m excited for HoTT because I believe it will serve as a rigorous mathematical foundation for artificial intelligence in the coming years. The closest thing I have found to a formalization of deep learning has been &lt;a href=&quot;http://yann.lecun.com/exdb/publis/pdf/lecun-06.pdf&quot;&gt;energy-based models&lt;/a&gt;, and with &lt;a href=&quot;http://www.cs.toronto.edu/~fritz/absps/cdmiguel.pdf&quot;&gt;contrastive divergence&lt;/a&gt;, they show dramatically the spacial nature of learning.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10px; padding-right:10px;&quot;&gt;
+        
+&lt;div class=&quot;figure&quot;&gt;
+    &lt;img style=&quot;&quot; src=&quot;http://localhost:4000/assets/images/2017/energy.gif/&quot; /&gt;
+    &lt;div class=&quot;desc&quot; style=&quot;font-size: ;&quot;&gt;&lt;a href=&quot;http://www.cs.nyu.edu/~yann/research/ebm/&quot;&gt;An animation by LeCun &lt;/a&gt; demonstrating constrastive divergence&lt;/div&gt;
+&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;10/6/2017 Update: RIP Vladimir Voevodsky&lt;/strong&gt;. He was a fundamental contributor to the ideas underlying HoTT.&lt;/p&gt;
+
+&lt;div class=&quot;full-width&quot;&gt;
+    &lt;div style=&quot;padding-left:10px; padding-right:10px;&quot;&gt;
+        
+&lt;div class=&quot;figure&quot;&gt;
+    &lt;img style=&quot;&quot; src=&quot;http://localhost:4000/assets/images/2017/vlad.jpg/&quot; /&gt;
+    &lt;div class=&quot;desc&quot; style=&quot;font-size: ;&quot;&gt;Vladimir Voevodsky&lt;/div&gt;
+&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;</content><author><name></name></author><summary type="html">A meditation on my initial perceptions of HoTT as I begin my studies on the subject.</summary></entry><entry><title type="html">Suffering</title><link href="http://localhost:4000/note/philosophy/2017/07/06/suffering.html" rel="alternate" type="text/html" title="Suffering" /><published>2017-07-06T12:20:24-04:00</published><updated>2017-07-06T12:20:24-04:00</updated><id>http://localhost:4000/note/philosophy/2017/07/06/suffering</id><content type="html" xml:base="http://localhost:4000/note/philosophy/2017/07/06/suffering.html">&lt;div class=&quot;figure&quot;&gt;
+    &lt;img style=&quot;&quot; src=&quot;http://localhost:4000/assets/images/2017/cross.jpg/&quot; /&gt;
+    &lt;div class=&quot;desc&quot; style=&quot;font-size: ;&quot;&gt;For in much wisdom is much grief: and he that increaseth knowledge increaseth sorrow.  -King James Bible&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;It is a common observation that many comedians have a dark depressing side to their nature — dubbed the sad clown. The common theory is that they have developed a great humor in order to abate their dark side. Likewise, wisdom is often developed in response to negative experience. I believe that all human experience is relativistic: that things can only be understood in respect to other things. Pain, suffering, sorrow, depression are all great modes of contrast which naturally lend themselves to deeper understanding by the nature of human experience itself — namely that it’s relativistic/contrastive.&lt;/p&gt;
+
+&lt;p&gt;Now before I get started on this reflection, I’d like to make it clear that I’m not positing that all knowledge or wisdom must come from suffering: “You can learn things the easy way or the hard way.” Pain is a brutish teacher. I do think, however, some lessons are very difficult to learn in the absence of suffering.&lt;/p&gt;
+
+&lt;p&gt;A method of judging design: it’s good design if no singular component stands out — that they all merge together to form a singular identity. Our lives are very similar to this in respect to suffering and is captured by the saying: “You don’t know what you have till it’s gone.” When we are in a state of equilibrium, where the opposing forces of our lives converge to a sonorous hum, it puts us to sleep — Nietzsche called this wretched contentment; however, when we lose something that is instrumental to maintaining our equilibrium, we get thrown into a vortex of utility gradients until we find a new state of equilibrium. Suffering gives us insight into our state of equilibrium and its characteristic by disrupting it and by putting us in a vortex of utility gradients which gives us relativistic viewpoints.&lt;/p&gt;
+
+&lt;div class=&quot;figure&quot;&gt;
+    &lt;img style=&quot;&quot; src=&quot;http://localhost:4000/assets/images/2017/warpLand.png&quot; /&gt;
+    &lt;div class=&quot;desc&quot; style=&quot;font-size: ;&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;</content><author><name></name></author><summary type="html">The things we avoid most are often our greatest teachers.</summary></entry><entry><title type="html">The Abuse of Logic</title><link href="http://localhost:4000/note/philosophy/2017/06/28/abuselog.html" rel="alternate" type="text/html" title="The Abuse of Logic" /><published>2017-06-28T12:20:24-04:00</published><updated>2017-06-28T12:20:24-04:00</updated><id>http://localhost:4000/note/philosophy/2017/06/28/abuselog</id><content type="html" xml:base="http://localhost:4000/note/philosophy/2017/06/28/abuselog.html">&lt;p&gt;In Bertrand Russell’s autobiography he describes his intellectual development through poignant stories. One story that has stuck with me is his recounting of his encounter with geometry as a boy. To sum it up: young Russell was looking to get to the bottom of things. When his brother showed him the axioms of Euclidean geometry and assured him that there was no truth or foundations deeper, we just have to believe them for the useful properties of Euclidean geometry to hold true, he became distressed. How could faith be at the root of truth?&lt;/p&gt;
+
+&lt;p&gt;I believe this proposition haunted Russell his entire life. It seems like a great contradiction: how could belief be the source of hard universal truth? We typically consider them opposite things. Saying I have a belief implies I don’t have all the information; that my rationality is in someway bounded and I cannot provide proof. Saying that something is “the truth” implies I can provide a proof; that I have enough information on the matter to declare certainty. The nature of proof is where the rub lies.&lt;/p&gt;
+
+&lt;p&gt;What is proof? The simplest form of logical proof can be found in syllogisms dating from the classical Greek philosophers.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;All men are mortal.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Socrates is a man.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;div style=&quot;text-align:right; font-weight:bold;&quot;&gt;Therefore Socrates is mortal.&lt;/div&gt;
+&lt;p&gt;&lt;br /&gt;
+The idea of syllogisms is that we have some propositions we assume to be true, then we simply apply logical inference to arrive at another proposition that must be true given the assumptions. Over the thousands of years since the Greeks, logic has become much more sophisticated by the development of higher order logic such as the predicate calculus; however, we have never escaped the fact that all logical proof is bounded by assumptions by the very definition of logical proof or logic itself. Given a logical state of the world, as captured by axioms, we can use rules of inference to paint a logical picture of what is implied by those truths. Logic breaks down when we are unable to state definitively what the truths or assumptions are. Probability emerged as a way of dealing with uncertainty in our conception of the world.&lt;/p&gt;
+
+&lt;p&gt;Regardless of it’s limits, logic is still extremely useful. All computation can be put on a logical footing — see computers. What’s interesting to me, and what I study, is that from logic and computation we are able to implement non-logical, probabilistic, models of the world that work really well in doing tasks traditionally seen as requiring intelligence.&lt;/p&gt;
+
+&lt;p&gt;In sum: logic is a tool for telling us what follows from a given state of affairs. Using logic as some sort of defense usually ignores that there are beliefs underpinning the logical conclusions which cannot be logically defended by the definition of axioms.&lt;/p&gt;</content><author><name></name></author><summary type="html">A reflection on how logic is abused.</summary></entry><entry><title type="html">Movement without Momentum</title><link href="http://localhost:4000/note/philosophy/2017/06/24/mwm.html" rel="alternate" type="text/html" title="Movement without Momentum" /><published>2017-06-24T12:20:24-04:00</published><updated>2017-06-24T12:20:24-04:00</updated><id>http://localhost:4000/note/philosophy/2017/06/24/mwm</id><content type="html" xml:base="http://localhost:4000/note/philosophy/2017/06/24/mwm.html">&lt;p&gt;One of the affable characteristics of mathematics I enjoy is that it forces you to think about the scope of a problem, variables, and anomalous states or contradictions that may occur. Math helps me think clearly and leads me to consider scenarios that would not be clear under the guise of non-mathematical thinking.&lt;/p&gt;
+
+&lt;p&gt;Long term versus short term rewards/utility create very interesting problems for intelligent life. If we use a greedy heuristic to guide us through the decision space — we choose the most preferable action at every decision step — we will, for many problems, arrive at overall sub-optimal solutions. Imagine if at every meal you ate candy and fatty foods because you like, for example, hot dogs over broccoli; you wouldn’t end up being a very healthy person over time, which if you value your health, is a sub optimal overall solution to your life. Much of wisdom is about navigating such decision spaces by avoiding local optima pitfalls.&lt;/p&gt;
+
+&lt;p&gt;This problem of relating local decisions/structure to global decisions/structure is actually quite universal across the mathematics I’m interested in — which falls under the umbrella of Artificial Intelligence. &lt;a href=&quot;https://www.youtube.com/watch?v=FmpDIaiMIeA&quot;&gt;Convolutional neural networks&lt;/a&gt; are fascinating mathematical objects that capture the dynamics between global and local relationships by using successive applications of convolutional kernels in a feed-forward manner such that they build up successive representations of progressively macro structural relationships as the depth of the network increases. Many state of the art artificial intelligence applications use convolutional neural networks due to this power of expressing the relationships between local and global decisions/structures. In fact the ancient game of &lt;em&gt;GO&lt;/em&gt; was &lt;a href=&quot;https://www.youtube.com/watch?v=derC33ODrME&quot;&gt;functionally solved by using these networks&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;How do we deal with this situation in our everyday lives? We use the notion of progress by figuring out our goals — overall utility AKA objective function — and what steps are needed to get there. Progress connects the notions of global and local utility. In simple problems, like going outside and driving a car to the supermarket, we know precisely what steps are needed to achieve our goals. Progress in achieving the objective in these trivial scenarios is simply a proportion of &lt;em&gt;done steps&lt;/em&gt; / &lt;em&gt;total steps&lt;/em&gt;; however, even in such a simple scenario, if we use time as a measure for progress instead of the proportion mentioned, we cannot arrive at precise estimates in a dynamical world. If we say our shopping trip is going to take 10 minutes, and five minutes into our shopping we proclaim we are half way done, we may feel silly when we get stuck in traffic that extends our trip time. In short, when we measure progress by time and we make statements about completion percentage or time left till completion, we are always assuming we know how long steps in the future will take. Computer Scientists have known this for a long time and have invented a notation for measuring the complexity/performance of algorithms in respect to varying magnitudes of parameters/inputs called &lt;a href=&quot;https://en.wikipedia.org/wiki/Big_O_notation&quot;&gt;Big O Notation&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;What about the case of problems/goals that are seemingly well defined objectively, but in terms of procedures to achieve them are ambiguous? We have all gotten lost in this scenario at some point and act or feel like we are at sea without a compass. Examples would be “become a musician,” “play rock music,” “make my wife happy.” There are naturally multiple ways of combining variables to achieve the same outcomes, but if you do not combine them with a particular motif or consistency heuristic, you will create a drawn a quartered solution that tries to go in too many solution directions and explodes. “Breakfast in bed,” “I want to play rock music similar to AC/DC,” “I want to be the first flutist of the New York Philharmonic,” are all examples of particular motifs that help us produce cohesive solutions… and it should be clear that in complex situations we will have hierarchies of related motifs.  Without historical precedents or role models, measuring progress of such fuzzy objectives is as impossible as knowing how far you need to go before you reach land when you are lost at sea; however, consistency can act as a compass that prevents you from toiling in a loop ad infinitum.&lt;/p&gt;
+
+&lt;p&gt;I’d also like to say one last thing about our perception of progress in others. People often use time/effort as a metric; yet telling me how long you’ve spent doing something, or how much hard work you’ve put into it, gives me no good indication of progress — as discussed above. It doesn’t tell me what steps you have taken and where you are in your journey. Many people make this critical mistake and become content with their supposed progress by virtue of equating time and effort expended to true progress. Rational people evaluate progress in respect to milestones or results that indicate the “step” one is on and in the case of fuzzy objectives at least approach things systematically. We tend to assume if someone spends a long time doing something they are probably good at it because we assume they have been measuring their progress properly and assume that someone will only spend a long time doing something if they are making progress, but as we all know from experience there are countless people that fall into common pitfalls of measuring progress and get stuck going nowhere.&lt;/p&gt;
+
+&lt;p&gt;At some point I will write about how language is a huge contributor to tricking ourselves. There are many cases where the same thing is simply said over and over again with different words and flavor sufficiently to be a novel solution/idea impostor, and we often consider this wasteful cycle progress.&lt;/p&gt;
+
+&lt;p&gt;So how do we avoid vain progress? Avoid using time as a metric, use historical milestones, and act with consistency in the face of the unknown.&lt;/p&gt;</content><author><name></name></author><summary type="html">How do we avoid vain progress?</summary></entry><entry><title type="html">Morning Reflection</title><link href="http://localhost:4000/note/philosophy/math/2017/06/21/mr.html" rel="alternate" type="text/html" title="Morning Reflection" /><published>2017-06-21T12:20:24-04:00</published><updated>2017-06-21T12:20:24-04:00</updated><id>http://localhost:4000/note/philosophy/math/2017/06/21/mr</id><content type="html" xml:base="http://localhost:4000/note/philosophy/math/2017/06/21/mr.html">&lt;p&gt;Wisdom was my first fixation.&lt;/p&gt;
+
+&lt;p&gt;From early on talk of “truth” surrounded me. It lead me to study philosophy — in particular the classical Greek philosophy of Plato, Socrates, and Aristotle. For a long time I felt that I was understanding more and getting to deeper levels of understanding, but what could I do with my knowledge? The amorphous form of what I got out of putting so much time into studying philosophy was unsettling to me. About 14 years ago, when I was 13, I started to study web programming — html, css, JavaScript. I started with HTML, and in my first hour of reading about it, I was making little web pages: I wrote code, and like magic to me, it displayed something in the web browser! So in my effort to find more tangible skills, programming seemed to be the best and most wide reaching option. From then on I would learn different languages on the side, sometimes very little, until I took it on full time in college.&lt;/p&gt;
+
+&lt;p&gt;I begrudgingly dealt with mathematics for a long time. I got into programming to make stuff happen. Mathematics in my early days was a hark back to the abstract nonsense in the vein of philosophy. When I started studying computer science seriously in college, mathematics took on a new form: I now saw it as a pure way of building knowledge about things that can be rigorously defended and expanded. To me, this is when mathematics brought everything in life together for me. Everything, every intellectual domain, can stimulate mathematical thinking.&lt;/p&gt;
+
+&lt;p&gt;Mathematics is the most precious human inheritance. With it, we can talk clearly about complicated systems, prove their properties, and do things like walk on the moon. It is clear to me that you can only go so far with solving problems in natural language. There becomes a point where the overhead of natural language is ridiculous and things begin to become nonsensical.  I’d like you to write an essay on how Maxwell’s equations work in enough detail that we can then produce results from your precise statements… it’s never going to happen. This is why when I found the work of Ludwig Wittgenstein I was relieved that there seemed to be good support for this thinking.&lt;/p&gt;
+
+&lt;div class=&quot;figure&quot;&gt;
+    &lt;img style=&quot;&quot; src=&quot;http://localhost:4000/assets/images/2017/wittgenstein.jpg/&quot; /&gt;
+    &lt;div class=&quot;desc&quot; style=&quot;font-size: ;&quot;&gt;“The limits of my language are the limits of my world” – Ludwig Wittgenstein&lt;/div&gt;
+&lt;/div&gt;</content><author><name></name></author><summary type="html">Wisdom was my first fixation.</summary></entry><entry><title type="html">The Universality of All Domains in Respect to Human Experience</title><link href="http://localhost:4000/minor/philosophy/2017/06/19/universality.html" rel="alternate" type="text/html" title="The Universality of All Domains in Respect to Human Experience" /><published>2017-06-19T12:20:24-04:00</published><updated>2017-06-19T12:20:24-04:00</updated><id>http://localhost:4000/minor/philosophy/2017/06/19/universality</id><content type="html" xml:base="http://localhost:4000/minor/philosophy/2017/06/19/universality.html">&lt;p&gt;Intelligence arose in life as a mechanism for evaluating the value of executing actions in the world. In higher order intelligence, such as humans, this mechanism converged to a type of simulation/model of the world; thus we have come to understand that a hallmark of intelligence is predicting the future and the fidelity of those predictions is determined by the parity of the world with our model of it — which we tune by another hallmark of intelligence: learning.&lt;/p&gt;
+
+&lt;p&gt;As I see it, the most primitive concept, which supports most of our knowledge, is the notion of identity. Identity is something that manifests itself in surprisingly complicated ways and at different levels of complexity. In respect to human psychology and the perception of ourselves, our identity serves as the basis of how we behave. This can be seen to a greater degree in young people, where the actions one takes are nothing but means to the end of keeping consistent with ones identity.&lt;/p&gt;
+
+&lt;p&gt;The inverse of consistency, inconsistency, is a derivative of identity over time. The reason why we consider this derivative to be the inverse of consistency, is that it gives us big values when consistency is low, and high values when consistency is high.&lt;/p&gt;
+
+&lt;div class=&quot;figure&quot;&gt;
+    &lt;img style=&quot;&quot; src=&quot;http://localhost:4000/assets/images/2017/consistency.png/&quot; /&gt;
+    &lt;div class=&quot;desc&quot; style=&quot;font-size: ;&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Generally we describe something in terms of its consistency, or how it changes in respect to time. Framed as such, one should see how identity is the building block of all dynamics.&lt;/p&gt;
+
+&lt;p&gt;The notion of identity also allows us to reason about the dependence and independence of distinct objects. If everything was one thing, shared one singular identity, we could not express any structure. It’s like when one becomes extremely drunk: things start to blur into each other and we have a hard time making sense of anything.&lt;/p&gt;
+
+&lt;div class=&quot;figure&quot;&gt;
+    &lt;img style=&quot;&quot; src=&quot;http://localhost:4000/assets/images/2017/univD.jpg/&quot; /&gt;
+    &lt;div class=&quot;desc&quot; style=&quot;font-size: ;&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;All domains subject to the application of our intelligence — music, science, art, etc, — are in form, the same thing with different dynamics. In each domain we have a set of things we can control, the parameters, and the outcome of adjusting the parameters. The whole reason why we find ourselves  to be adjusting parameters in the first place is that we have some affinity to results in the outcome space ( called a &lt;em&gt;utility&lt;/em&gt; function ). When we learn, we figure out how to produce high affinity outputs from our adjustment of parameters. I call this type of learning a &lt;em&gt;mapping&lt;/em&gt; from one space to another: when we do something in one space, how does it influence the other.&lt;/p&gt;
+
+&lt;p&gt;It’s important to note that this mapping is not always, or usually, a function. That is to say: there may be multiple parameter distributions that produce the same outcome.  So this produces a strange situation: multiple learners can learn to do the same thing in different ways — we shall call this a &lt;em&gt;learning style&lt;/em&gt; or &lt;em&gt;learning bias&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;This formulation gives rise to different tasks we often solve in our daily lives:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Given an observed outcome, what value of parameters or classes of parameters gave rise to the observed outcome?&lt;/li&gt;
+  &lt;li&gt;Given a set of parameter values, how do we adjust them such that we get a particular outcome or get a higher affinity outcome?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;So far we’ve assumed a global utility function, the mapping from outcomes to affinities/utilities, across all learners. This can’t be further from the truth. Much of the complexity in life lies in our differing utility functions which produce different emotions/gradients in parameter space.&lt;/p&gt;
+
+&lt;p&gt;Consider my hypothetical arch enemy Joe. His utility function is the inverse of mine and we are locked in a zero sum game in parameter space. When he turns a button off, I want to turn it on because the result in the outcome space is unpleasing to me. The tragedy of this scenario is that we are both doing the same thing — adjusting parameters to maximize utility in outcome space,– but we hate each other. This is, however, an unavoidable tragedy due to our conflicting utility functions.&lt;/p&gt;
+
+&lt;p&gt;The tragedies of the greatest degree happen when we share the same utility function, but have learned different parameters for maximizing the the common utility function. In these cases, we tend to become zealots for our learned parameter distribution because it is the TRUTH! They lead to the desirable outcome! And because our position is “correct” we tend to fight against the “incorrect” position. Mathematics may never change our utility functions, but it certainly can show when we are fighting in ignorance.&lt;/p&gt;</content><author><name></name></author><summary type="html">Why do we experience a sense of familiarity in waters we have never tread?</summary></entry><entry><title type="html">Computational Democracy: A Framework for Open Research Institutions</title><link href="http://localhost:4000/minor/software/distributed/2016/06/16/compd.html" rel="alternate" type="text/html" title="Computational Democracy: A Framework for Open Research Institutions" /><published>2016-06-16T12:20:24-04:00</published><updated>2016-06-16T12:20:24-04:00</updated><id>http://localhost:4000/minor/software/distributed/2016/06/16/compd</id><content type="html" xml:base="http://localhost:4000/minor/software/distributed/2016/06/16/compd.html">&lt;center&gt;
+    &lt;h4&gt;WORK DONE — CURRENCY PRODUCED — RESEARCH SHARED&lt;/h4&gt;
+&lt;/center&gt;
+&lt;p&gt;We live in the age of big data. No matter from what discipline you hail, if you delve deep into things, chances are you have scores of data that must analysed in order to unearth some principles that govern the construction of that data. There are a few well known ongoing programs that enable unvetted citizen scientists or science minded citizens to participate by lending their resources, both computational and mental, in a distributive effort to solve divide and conquer problems — a class of problems which lends itself well to data processing, so data processing is the most salient use case. Most of these programs are geared toward particular problems where user participation is limited to the offering of resources and there is little feeling of being part of the process. If you take a good look at all these systems a clear superstructure emerges: the spirit of what they are doing in the most general form.&lt;/p&gt;
+
+&lt;div class=&quot;quote&quot;&gt;
+    A &lt;b&gt;Computational Democracy&lt;/b&gt; is an organization bound together by shared resources in order to compute a common aim where the resources provisioned to the collective by the individual are directly proportional to the progress of the whole.
+&lt;/div&gt;
+
+&lt;p&gt;I want people to feel like their computation matters! I believe this is not only a vain desire but a key psychological and economic mechanic that will not only keep these computational democracies united, but also make them flourish. How do we achieve this? We turn computation into a vote, but not all computations are equal, so a vote in this sense naturally has an associated magnitude. When one comes down this line of reasoning a form of currency — a cousin of cryptocurrency — naturally comes to mind: a kind of decentralized currency that is given value by computations done in computational democracies.&lt;/p&gt;
+
+&lt;div class=&quot;figure&quot;&gt;
+    &lt;img style=&quot;&quot; src=&quot;http://localhost:4000/assets/images/2016/coins.png/&quot; /&gt;
+    &lt;div class=&quot;desc&quot; style=&quot;font-size: ;&quot;&gt;A currency for research&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;the-vision--view&quot;&gt;The Vision &amp;amp; View&lt;/h1&gt;
+&lt;p&gt;The world and its people are diverse. Not everyone has the same interests and following priorities. It’s why everyone isn’t trying to cure cancer, but also may be the reason it is cured — because we have learned overtime that big problems require a multidisciplinary approach. Computational democracies (CompD’S) can exist wherever there is a culture of openness and desire for mutual enlightenment. The functional role a computational democracy will serve in any community is the maximizing of coordinated computing efforts or problem solving. There are two types of citizens in a CompD: planning and action. Planning citizens are those who actively submit proposals for usage of resources — kind of like the government or leadership, but with a much nicer bent. Action citizens are those who provide confirmation of the choices set forth by planners by providing resources. ( My heart sings for a universal system for solving all problems, computable and uncomputable, and I see that system as the ultimate successor to this one, but I must limit myself somewhere. )&lt;/p&gt;
+
+&lt;p&gt;Due to the diversity of all things human, it’s really hard to say how CompD’s will evolve in the wild. There will inevitably be small groups and extremely large groups, and I’m not sure how well a democracy of five scales to a democracy of millions; however, there must be some consistency or guidelines for all sized communities. The notion of research currency and it’s value based on work done is one such constant. In cryptocurrencies there are programs called miners which solve chunks of cryptographic problems. These cryptographic problems and their hardness serve as a basis for value because they are proportional to the amount of resources required to solve them; thus they serve the function of transforming one value, computation time, into another, magical internet money. In our case, the computations done in solving problems will serve as the basis for research currency — the miners.&lt;/p&gt;
+
+&lt;div class=&quot;quote&quot;&gt;
+    &lt;b&gt;Conservation of Value&lt;/b&gt;: Value is never created nor destroyed, it is transformed.
+&lt;/div&gt;
+
+&lt;p&gt;It’s best to explain CompD’s by how different users will interact with the democracy. Here’s an outline of how a CompD could work for action citizens:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;Put your computer(s) to work.&lt;/strong&gt; Allocate computer resources to a CompD in order to generate vote currency. Many users will be passive supporters of the democracy.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Find things to vote on.&lt;/strong&gt; This stage is one that will scale differently across different groups. Some democracies may require intricate systems to help people find projects they are interested in, others will have only a handful of projects on the platform. In the case of larger democracies, I suggest vote currency be used for something like an upvote feature.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Vote with your computations.&lt;/strong&gt; You can assign your resources to any problem in the democracy and earn currency proportional to your resources offered.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Vote with your currency.&lt;/strong&gt; Here’s the tricky part. What are we going to do with this research currency generated? If there is an eventual correspondence to other digital currencies like bitcoin, then voting with your currency could literally mean giving money to certain research projects — because not every problem requires only pure computation. That is the ultimate goal here, but in the meantime, I propose we use the currency for the promotion and discovery of projects( more later ).&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Then there are people who are simply interested in securing computer time for their projects. Here’s an outline of how a CompD could work for planning citizens:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;Design a proposal that can be accomplished distributively.&lt;/strong&gt; In this type of ecosystem, every proposal has to have a method of distributing the work. The details of how such proposals will actually be structured is a bit technical and would need to be studied in depth.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Submit the proposal and make your case to the people.&lt;/strong&gt; This stage is like a politician campaigning for votes. Planners will need to convince people that their resources will further the overall goals of the democracy by choosing to afford your project resources.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;When finished, publish your results.&lt;/strong&gt; All results must be open to all members of the democracy. It may be interesting to play with the idea of crediting large contributors, but those details will have to be left to the implementers of these democracies.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;What I lay before you is but an idea, a seed, and like all seeds, this must be given time and resources to take root and flourish. In my view, there is a need in this era for systems that marshall shared resources, in different communities, for the greater good of those communities. I limit myself to computing, because it is the most tangible and universal.&lt;/p&gt;
+
+&lt;h1 id=&quot;triple-value&quot;&gt;Triple Value&lt;/h1&gt;
+&lt;p&gt;Computational democracies triple the value of research. First there is value in the work actually being done: the computations needed to reveal the hidden nugget in the data. Then there is value in the currency being produced by that work — which we abstractly see as serving the same role as a cryptocurrency miner. Then, the most awesome value, is the shared research and newfound wisdom produced.&lt;/p&gt;
+
+&lt;h1 id=&quot;the-vote-and-currency-equivalence&quot;&gt;The Vote and Currency Equivalence&lt;/h1&gt;
+&lt;p&gt;I see a social sharing site similar to reddit being crucial the the success of a computational democracy. Imagine a reddit where instead of having link posts, you have research proposals, and instead an upvote, you can press a button and have your computer automatically start giving that project resources while generating currency. The comment section would be a forum dedicated to that project. You can really let your mind run wild with ideas. Then there’s ideas of different computational democracies run by different groups. Will their currencies be equal? Will there need to be an underlying standard for this concept to even work? Probably, but we can’t solve all the problems in one medium article. This is just a message in a bottle to the world.&lt;/p&gt;
+
+&lt;p&gt;If vote currencies emanating from computational democracies do create a new unified digital currency, will it have an equivalence to cryptocurrency? This is a question I’m weary of answering so soon. I don’t think there needs to be an equivalence because we can find inherent uses for the currency within the democracies, but then again, it would lead to very interesting prospects if we have a self-funding means to provide projects with concrete cash as well as computing resources. In any case, we must be careful how we approach the boundary between vote currency, cryptocurrency, and benjamins.&lt;/p&gt;
+
+&lt;h1 id=&quot;the-future&quot;&gt;The Future&lt;/h1&gt;
+&lt;p&gt;My aim of this article was to briefly talk about this idea of computational democracies and how I think they could amplify value and be a great force for good. I know this article is wanting much detail, but in all honesty, I’m still trying to imagine what such a institutions would look like. At the root of computational democracies are these main ideas:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Work produces inherent value.&lt;/li&gt;
+  &lt;li&gt;You should be able to choose where your resources are used.&lt;/li&gt;
+  &lt;li&gt;We should benefit from helping each other.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I look forward to hearing your ideas on how to make computational democracies for the betterment of us all.&lt;/p&gt;</content><author><name></name></author><summary type="html">How do we structure research organizations in the age of blockchain?</summary></entry></feed>

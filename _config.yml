@@ -1,21 +1,48 @@
-# Site settings
-title: Site Title
-author: Your Name
-author_avatar: https://gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=50
-email: alias@domain.tld
-description: Blog about whatever.
-baseurl: "" # optional
-url: "https://foo_bar.github.io"
-#twitter_username: foo_bar
-#github_username: foo_bar
-github_repo: foo_bar/foo_bar.github.io
-#google_analytics: UA-80085-YOUR-ID
-# disqus: disqus-id
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely edit after that. If you find
+# yourself editing this file very often, consider using Jekyll's data files
+# feature for the data you need to update frequently.
+#
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
 
+# Site settings
+# These are used to personalize your new site. If you look in the HTML files,
+# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
+# You can create any custom variable you would like, and they will be accessible
+# in the templates via {{ site.myvariable }}.
+title: Andrew Ribeiro 
+email: andrewnetwork@gmail.com
+description: >- # this means to ignore newlines until "baseurl:"
+  I blog about software, mathematics, machine learning, philosophy, psychology, art and the connections between them. 
+  My main interest is machine learning and how
+  it can be used to automatically build models that are near impossible for humans to 
+  develop with traditional methods. 
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "" # the base hostname & protocol for your site, e.g. http://example.com
+twitter_username: AndrewJRibeiro
+github_username:  Andrewnetwork
+linkedin_username: andrewribeiro
+location: Danbury, CT
 # Build settings
 markdown: kramdown
-permalink: pretty
-excerpt_separator: "<!-- more -->"
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
 
-gems:
-  - jekyll-sitemap
+google_analytics: UA-76489543-2
+show_excerpts: true
+
+# Exclude from processing.
+# The following items will not be processed, by default. Create a custom list
+# to override the default setting.
+# exclude:
+#   - Gemfile
+#   - Gemfile.lock
+#   - node_modules
+#   - vendor/bundle/
+#   - vendor/cache/
+#   - vendor/gems/
+#   - vendor/ruby/

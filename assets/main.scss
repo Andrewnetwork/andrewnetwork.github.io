@@ -1,0 +1,62 @@
+---
+# Only the main Sass file needs front matter (the dashes are enough)
+---
+
+@import "minima";
+
+body{
+    font-size: 18px;
+    overflow-x: hidden;
+}
+.quote{
+    font-style: italic;
+    padding-top: 10px;
+    padding-bottom: 14px;
+    border-left: solid black thick;
+    padding-left: 20px;
+    margin-bottom: 15px;
+}
+
+.quote b{
+    color: grey;
+}
+
+.figure{
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.figure .desc{
+    font-size: 12px;
+    padding-top: 4px;
+}
+
+.full-width{
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+}
+
+.flex-container{
+    display:flex;
+}
+
+.flex-container.center{
+    justify-content:center;
+}
+
+.site-footer{
+    background-color: #f2f2f2;
+}
+
+.footer-col-1{
+    width: 200px;
+}
+
+.noteBox{
+    margin-right: 10px;
+    font-size: 14px;
+}
