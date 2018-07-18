@@ -6,7 +6,7 @@ categories: note philosophy
 excerpt: The things we avoid most are often our greatest teachers. 
 ---
 
-{% include figure.html src="/assets/images/2017/cross.jpg/" desc="For in much wisdom is much grief: and he that increaseth knowledge increaseth sorrow.  -King James Bible" %}
+{% include figure.html src="/assets/images/2017/cross.jpg" desc="For in much wisdom is much grief: and he that increaseth knowledge increaseth sorrow.  -King James Bible" %}
 
 It is a common observation that many comedians have a dark depressing side to their nature — dubbed the sad clown. The common theory is that they have developed a great humor in order to abate their dark side. Likewise, wisdom is often developed in response to negative experience. I believe that all human experience is relativistic: that things can only be understood in respect to other things. Pain, suffering, sorrow, depression are all great modes of contrast which naturally lend themselves to deeper understanding by the nature of human experience itself — namely that it’s relativistic/contrastive.
 
