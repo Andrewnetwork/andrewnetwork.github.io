@@ -48,6 +48,10 @@ body{
     justify-content:center;
 }
 
+.flex-container.wrap{
+    flex-wrap: wrap;
+}
+
 .site-footer{
     background-color: #f2f2f2;
 }
@@ -58,5 +62,8 @@ body{
 
 .noteBox{
     margin-right: 10px;
+    padding-right: 10px;
     font-size: 14px;
+    white-space: nowrap;
+    border-right: dotted thin grey;
 }

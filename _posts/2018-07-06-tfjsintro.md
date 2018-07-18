@@ -3,7 +3,7 @@ layout: post
 title:  "A Project Based Introduction to TensorFlow.js"
 date:   2018-07-06 12:20:24 -0400
 categories: major machine-learning tensorflow javascript
-excerpt: In this post we introduce how to use TensorFlow.js by demonstrating how it was used in the simple project Neural Titanic. In this project, we show how to visualize the evolution of the predictions of a single layer neural network as it is being trained on the tabular Titanic Dataset for the task of binary classification of passenger survival
+excerpt: In this post we introduce how to use TensorFlow.js by demonstrating how it was used in the simple project Neural Titanic. In this project, we show how to visualize the evolution of the predictions of a single layer neural network as it is being trained on the tabular Titanic Dataset for the task of binary classification of passenger survival.
 ---
 
 {% include figure.html src="/assets/images/2018/pbtfjs/tfjs.png" %}
