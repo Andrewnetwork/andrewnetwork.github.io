@@ -12,13 +12,13 @@ As I see it, the most primitive concept, which supports most of our knowledge, i
 
 The inverse of consistency, inconsistency, is a derivative of identity over time. The reason why we consider this derivative to be the inverse of consistency, is that it gives us big values when consistency is low, and high values when consistency is high.
 
-{% include figure.html src="/assets/images/2017/consistency.png/"  %}
+{% include figure.html src="/assets/images/2017/consistency.png"  %}
 
 Generally we describe something in terms of its consistency, or how it changes in respect to time. Framed as such, one should see how identity is the building block of all dynamics.
 
 The notion of identity also allows us to reason about the dependence and independence of distinct objects. If everything was one thing, shared one singular identity, we could not express any structure. It’s like when one becomes extremely drunk: things start to blur into each other and we have a hard time making sense of anything.
 
-{% include figure.html src="/assets/images/2017/univD.jpg/"  %}
+{% include figure.html src="/assets/images/2017/univD.jpg"  %}
 
 All domains subject to the application of our intelligence — music, science, art, etc, — are in form, the same thing with different dynamics. In each domain we have a set of things we can control, the parameters, and the outcome of adjusting the parameters. The whole reason why we find ourselves  to be adjusting parameters in the first place is that we have some affinity to results in the outcome space ( called a *utility* function ). When we learn, we figure out how to produce high affinity outputs from our adjustment of parameters. I call this type of learning a *mapping* from one space to another: when we do something in one space, how does it influence the other.
 
