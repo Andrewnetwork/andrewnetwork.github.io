@@ -28,6 +28,17 @@ layout: default
       {%- endfor -%}
     </ul>
   {%- endif -%}
+  
+  {%- if site.categories.talk.size > 0 -%}
+    <h2 class="post-list-heading">Talks</h2>
+    <div class="flex-container center wrap">
+      {%- for post in site.categories.talk -%}
+        <div class="talkIcon"><a href="{{post.slides}}"><img src="{{post.img}}"/></a></div>
+      {%- endfor -%}
+    </div>
+    <br/>
+  {%- endif -%}
+
   {%- if site.categories.minor.size > 0 -%}
     <h2 class="post-list-heading">Minor Posts</h2>
     <ul class="post-list">
